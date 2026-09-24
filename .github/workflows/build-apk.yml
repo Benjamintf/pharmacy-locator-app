@@ -1,0 +1,49 @@
+name: Build Pharmacy Locator APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Extract project
+        run: |
+          unzip -o pharmacy_locator_app.zip -d extracted
+          echo "Project extracted"
+          find extracted -maxdepth 3 -type f | head -50
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Prepare Android project
+        run: |
+          cd extracted/pharmacy_locator_app/flutter_app
+          flutter create --platforms=android .
+
+      - name: Install dependencies
+        run: |
+          cd extracted/pharmacy_locator_app/flutter_app
+          flutter pub get
+
+      - name: Build APK
+        run: |
+          cd extracted/pharmacy_locator_app/flutter_app
+          flutter build apk --release
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: pharmacy-locator-apk
+          path: extracted/pharmacy_locator_app/flutter_app/build/app/outputs/flutter-apk/app-release.apk
+          if-no-files-found: error
