@@ -16,7 +16,7 @@ jobs:
 
       - name: Extract project
         run: |
-          unzip -o pharmacy_locator_app.zip -d extracted
+          unzip -o pharmacy_locator_app_fixed.zip -d extracted
           echo "Project extracted"
           find extracted -maxdepth 3 -type f | head -50
 
